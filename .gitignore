@@ -1,0 +1,48 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+!server/.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+server/backend.log
+
+# Dependencies
+node_modules
+server/node_modules
+
+# Build output
+dist
+dist-ssr
+*.local
+
+# Uploads (user-generated files, not for repo)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# One-off scripts
+scripts/
+write-signup.cjs
+
+# Lock files (keep package-lock, ignore bun)
+bun.lockb
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
