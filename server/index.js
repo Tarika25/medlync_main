@@ -564,6 +564,103 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', database: 'medlync' });
 });
 
+// One-time DB setup endpoint — run once then remove
+app.get('/api/setup', async (req, res) => {
+  try {
+    await pool.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
+    await pool.query(`DO $$ BEGIN CREATE TYPE user_role AS ENUM ('doctor', 'patient', 'pharmacy'); EXCEPTION WHEN duplicate_object THEN null; END $$`);
+    await pool.query(`CREATE TABLE IF NOT EXISTS users (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      name VARCHAR(255) NOT NULL,
+      email VARCHAR(255) UNIQUE NOT NULL,
+      password_hash VARCHAR(255) NOT NULL,
+      role user_role NOT NULL,
+      phone VARCHAR(50),
+      hospital_name VARCHAR(255),
+      pharmacy_name VARCHAR(255),
+      date_of_birth DATE,
+      age INTEGER,
+      gender VARCHAR(20),
+      is_minor BOOLEAN DEFAULT FALSE,
+      parent_account_id UUID REFERENCES users(id),
+      relationship_type VARCHAR(50),
+      profile_photo_url TEXT,
+      patient_unique_id VARCHAR(50) UNIQUE,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )`);
+    await pool.query(`CREATE TABLE IF NOT EXISTS hospital_doctors (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      hospital_user_id UUID NOT NULL REFERENCES users(id),
+      name VARCHAR(255) NOT NULL,
+      specialization VARCHAR(255),
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )`);
+    await pool.query(`CREATE TABLE IF NOT EXISTS prescriptions (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      patient_id UUID NOT NULL REFERENCES users(id),
+      doctor_id UUID NOT NULL REFERENCES users(id),
+      doctor_name VARCHAR(255),
+      prescription_code VARCHAR(50) UNIQUE NOT NULL,
+      barcode_id VARCHAR(100),
+      status VARCHAR(20) DEFAULT 'Active',
+      validity_days INTEGER DEFAULT 7,
+      expires_at TIMESTAMPTZ,
+      chief_complaint TEXT,
+      symptoms TEXT,
+      diagnosis TEXT,
+      follow_up_date DATE,
+      additional_notes TEXT,
+      collected_by VARCHAR(20),
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )`);
+    await pool.query(`CREATE TABLE IF NOT EXISTS medicines (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      prescription_id UUID NOT NULL REFERENCES prescriptions(id) ON DELETE CASCADE,
+      name VARCHAR(255) NOT NULL,
+      dosage VARCHAR(100) NOT NULL,
+      frequency VARCHAR(100) NOT NULL,
+      duration VARCHAR(100) NOT NULL,
+      refill_count INTEGER DEFAULT 0,
+      end_date DATE,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )`);
+    await pool.query(`CREATE TABLE IF NOT EXISTS transactions (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      prescription_id UUID NOT NULL REFERENCES prescriptions(id),
+      pharmacy_id UUID NOT NULL REFERENCES users(id),
+      dispensed_at TIMESTAMPTZ DEFAULT NOW()
+    )`);
+    await pool.query(`CREATE TABLE IF NOT EXISTS hospitals (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL UNIQUE,
+      city VARCHAR(100) NOT NULL DEFAULT 'Coimbatore',
+      type VARCHAR(50) NOT NULL DEFAULT 'hospital',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )`);
+    await pool.query(`INSERT INTO hospitals (name, city, type) VALUES
+      ('Kovai Medical Center and Hospital (KMCH)', 'Coimbatore', 'hospital'),
+      ('PSG Institute of Medical Sciences & Research', 'Coimbatore', 'hospital'),
+      ('Coimbatore Medical College Hospital', 'Coimbatore', 'hospital'),
+      ('Sri Ramakrishna Hospital', 'Coimbatore', 'hospital'),
+      ('Ganga Medical Centre & Hospital', 'Coimbatore', 'hospital'),
+      ('KG Hospital', 'Coimbatore', 'hospital'),
+      ('Gem Hospital', 'Coimbatore', 'hospital'),
+      ('Aravind Eye Hospital', 'Coimbatore', 'hospital'),
+      ('Royal Care Super Specialty Hospital', 'Coimbatore', 'hospital'),
+      ('VGM Hospital', 'Coimbatore', 'hospital'),
+      ('Sri Ramakrishna Hospital', 'Coimbatore', 'hospital'),
+      ('Lotus Eye Hospital', 'Coimbatore', 'hospital'),
+      ('Sankara Eye Hospital', 'Coimbatore', 'hospital'),
+      ('ESI Hospital', 'Coimbatore', 'hospital'),
+      ('Karpagam Medical College Hospital', 'Coimbatore', 'hospital')
+      ON CONFLICT (name) DO NOTHING`);
+    res.json({ success: true, message: 'Schema applied successfully' });
+  } catch (err) {
+    console.error('Setup error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`MedLync server running on http://localhost:${PORT}`);
 });
