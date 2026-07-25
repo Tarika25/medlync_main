@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'medlync-secret-key-change-in-production';
 
 // Middleware
@@ -465,7 +465,7 @@ app.get('/api/pharmacy/transactions', authenticate, async (req, res) => {
 app.post('/api/upload/profile-photo', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-const url = `http://localhost:${PORT}/uploads/${req.file.filename}`;
+    const url = `${process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`}/uploads/${req.file.filename}`;
     res.json({ url });
   } catch (err) {
     console.error('Upload error:', err);

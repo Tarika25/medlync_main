@@ -1,9 +1,8 @@
 services:
-  # ── Backend (Express + PostgreSQL) ──────────────────────────
   - type: web
     name: medlync-server
     runtime: node
-    rootDir: rx-guardian-main/server
+    rootDir: server
     buildCommand: npm install
     startCommand: node index.js
     envVars:
@@ -13,18 +12,13 @@ services:
           property: connectionString
       - key: JWT_SECRET
         generateValue: true
-      - key: TWILIO_ACCOUNT_SID
-        sync: false
-      - key: TWILIO_AUTH_TOKEN
-        sync: false
-      - key: TWILIO_PHONE_NUMBER
-        sync: false
+      - key: NODE_ENV
+        value: production
 
-  # ── Frontend (React/Vite) ────────────────────────────────────
   - type: web
     name: medlync-frontend
     runtime: static
-    rootDir: rx-guardian-main
+    rootDir: .
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
@@ -35,7 +29,6 @@ services:
           property: host
           format: https://{host}/api
 
-# ── PostgreSQL Database ──────────────────────────────────────
 databases:
   - name: medlync-db
     databaseName: medlync
