@@ -18,7 +18,14 @@ const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'medlync-secret-key-change-in-production';
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:8080',
+    'http://localhost:5173',
+    'https://medlync.onrender.com'
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 // File upload config
