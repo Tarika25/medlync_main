@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: medlync-server
+    name: medlync-backend
     runtime: node
     rootDir: server
     buildCommand: npm install
@@ -15,19 +15,14 @@ services:
       - key: NODE_ENV
         value: production
 
-  - type: web
-    name: medlync-frontend
-    runtime: static
+  - type: static
+    name: medlync
     rootDir: .
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: medlync-server
-          type: web
-          property: host
-          format: https://{host}/api
+        value: https://medlync-backend.onrender.com/api
 
 databases:
   - name: medlync-db
