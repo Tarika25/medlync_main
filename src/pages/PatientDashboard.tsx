@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { listPrescriptions, getFamilyMembers, addFamilyMember, uploadProfilePhoto } from "@/lib/api";
+import { fetchPrescriptions, fetchFamilyMembers, addFamilyMember, uploadProfilePhoto } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,8 +43,8 @@ export default function PatientDashboard() {
 
   useEffect(() => {
     Promise.all([
-      listPrescriptions().then((res) => setPrescriptions(res.prescriptions || [])),
-      getFamilyMembers().then((res) => setFamilyMembers(res.members || [])).catch(() => {}),
+      fetchPrescriptions().then((res) => setPrescriptions(res.prescriptions || [])),
+      fetchFamilyMembers().then((res) => setFamilyMembers(res.members || [])).catch(() => {}),
     ]).catch((err) => toast({ title: "Error", description: err.message, variant: "destructive" }))
       .finally(() => setLoading(false));
   }, []);
@@ -66,7 +66,7 @@ export default function PatientDashboard() {
       setFamilyOpen(false);
       setMemberName(""); setMemberEmail(""); setMemberPassword(""); setMemberDob("");
       setMemberRelationship(""); setMemberGender(""); setMemberPhoto(null); setMemberPhotoPreview("");
-      const res = await getFamilyMembers();
+      const res = await fetchFamilyMembers();
       setFamilyMembers(res.members || []);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });

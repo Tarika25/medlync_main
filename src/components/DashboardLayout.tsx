@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <Pill className="h-6 w-6 text-primary" />
-              <span className="text-lg font-display font-bold text-foreground">PharmaLync</span>
+              <span className="text-lg font-display font-bold text-foreground">MedLync</span>
             </div>
             <div className="hidden sm:flex items-center gap-2 ml-4 px-3 py-1 rounded-full bg-secondary">
               <Icon className="h-4 w-4 text-secondary-foreground" />

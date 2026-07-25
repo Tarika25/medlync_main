@@ -1,83 +1,89 @@
 # MedLync
 
-MedLync is a care-focused prescription workspace for doctors, patients, and pharmacies. It helps teams manage prescriptions, verify eligibility, and support safe pickup workflows in one place.
+A prescription management app built for clinics, patients, and pharmacies. Doctors create prescriptions, patients track them, and pharmacies verify and dispense — all in one place.
 
-## What this product does
+## What it does
 
-- Doctors can create prescriptions and manage the care team linked to a hospital.
-- Patients can view prescriptions, track refill reminders, and manage family access.
-- Pharmacies can verify prescription codes and complete dispensing steps securely.
+- Doctors create digital prescriptions with medicine details, diagnosis, and follow-up dates
+- Patients see all their prescriptions, get refill reminders, and can add family members
+- Pharmacies scan or enter a prescription code to verify and dispense it
+- Every prescription gets a unique barcode for quick lookup
 
-## Core stack
+## Tech stack
 
-- Frontend: React, TypeScript, Vite, Tailwind CSS, shadcn/ui
-- Backend: Node.js and Express
-- Database: PostgreSQL
-- Authentication: JWT with bcrypt
+- React + TypeScript + Vite
+- Tailwind CSS + shadcn/ui
+- Node.js + Express
+- PostgreSQL
+- JWT authentication
 
-## Project structure
+## Folder structure
 
-- src/pages: public pages and role-based dashboards
-- src/components: shared UI shell and dashboard layout
-- src/contexts: authentication state
-- src/lib: API helpers and shared utilities
-- server: Express API and PostgreSQL schema
+```
+src/
+  pages/        — role-based dashboards and public pages
+  components/   — shared layout and UI pieces
+  contexts/     — auth state
+  lib/          — API calls and utilities
+server/
+  index.js      — all backend routes
+  db.js         — PostgreSQL connection
+  schema.sql    — database tables and seed data
+```
 
-## Local setup
+## Running locally
 
-### 1. Prerequisites
+### Requirements
 
-- Node.js 18 or newer
+- Node.js 18+
 - PostgreSQL running locally
 
-### 2. Create the database
+### 1. Set up the database
 
 ```bash
 createdb medlync
 psql -d medlync -f server/schema.sql
 ```
 
-### 3. Configure environment variables
+### 2. Configure environment
 
-Create a file at server/.env with:
+Copy the example and fill in your values:
+
+```bash
+cp server/.env.example server/.env
+```
 
 ```env
-JWT_SECRET=change-this-secret
-DATABASE_URL=postgresql://postgres:root@localhost:5432/medlync
+JWT_SECRET=your-secret-here
+DATABASE_URL=postgresql://postgres:yourpassword@localhost:5432/medlync
 ```
 
-### 4. Install dependencies
+### 3. Install and run
 
 ```bash
+# Backend
 cd server
 npm install
+npm run dev
+
+# Frontend (new terminal)
 cd ..
 npm install
-```
-
-### 5. Run the app
-
-Start the backend:
-
-```bash
-cd server
-npm start
-```
-
-Start the frontend:
-
-```bash
 npm run dev
 ```
 
-The frontend is usually available at http://localhost:5173 and the API at http://localhost:3001.
+Frontend runs at `http://localhost:8080`, backend at `http://localhost:3001`.
 
-## Notes on development
+## Accounts to test with
 
-- The frontend uses API helpers from src/lib/api.ts.
-- The backend routes are grouped under /api and expect a PostgreSQL database with the schema from server/schema.sql.
-- The app includes a small regression test suite under src/test.
+Sign up with any email and pick a role — doctor, patient, or pharmacy. Each role gets its own dashboard.
 
-## License
+- Doctors need to add at least one doctor name under "Manage Doctors" before creating a prescription
+- Patients registered through the doctor dashboard get a unique ID like `PAT-2026-0001`
+- Pharmacies verify prescriptions by entering the prescription code or scanning the barcode
 
-This project is provided as-is for local development and product demos.
+## Notes
+
+- Uploaded profile photos are stored in `server/uploads/` — this folder is excluded from git
+- The `server/.env` file is never committed — use `.env.example` as a reference
+- Minor patients (under 18) must be added through a parent account

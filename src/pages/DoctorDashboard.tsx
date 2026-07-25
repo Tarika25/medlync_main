@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { createPrescription, listPrescriptions, searchAllPatients, registerPatient, getHospitalDoctors, addHospitalDoctor, removeHospitalDoctor } from "@/lib/api";
+import { createPrescription, fetchPrescriptions, searchAllPatients, registerPatient, fetchHospitalDoctors, addHospitalDoctor, removeHospitalDoctor } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,7 +61,7 @@ export default function DoctorDashboard() {
   const fetchDashboardData = async () => {
     try {
       const [prescriptionResponse, patientResponse, doctorResponse] = await Promise.all([
-        listPrescriptions(), searchAllPatients(), getHospitalDoctors()
+        fetchPrescriptions(), searchAllPatients(), fetchHospitalDoctors()
       ]);
       setPrescriptions(prescriptionResponse.prescriptions || []);
       setPatients(patientResponse.patients || []);
@@ -173,7 +173,7 @@ export default function DoctorDashboard() {
       toast({ title: "Doctor added!" });
       setNewDoctorName("");
       setNewDoctorSpec("");
-      const res = await getHospitalDoctors();
+      const res = await fetchHospitalDoctors();
       setHospitalDoctors(res.doctors || []);
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });

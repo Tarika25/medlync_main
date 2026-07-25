@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import { verifyPrescription, dispensePrescription, getTransactions } from "@/lib/api";
+import { verifyPrescriptionByCode, dispensePrescription, fetchTransactions } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +25,7 @@ export default function PharmacyDashboard() {
   const { toast } = useToast();
 
   useEffect(() => {
-    getTransactions()
+    fetchTransactions()
       .then((res) => setTransactions(res.transactions || []))
       .catch(() => {})
       .finally(() => setLoadingTx(false));
@@ -37,7 +37,7 @@ export default function PharmacyDashboard() {
     setPrescription(null);
     setVerifyError("");
     try {
-      const res = await verifyPrescription(code.trim());
+      const res = await verifyPrescriptionByCode(code.trim());
       setPrescription(res.prescription);
     } catch (err: any) {
       setVerifyError(err.message);
@@ -55,7 +55,7 @@ export default function PharmacyDashboard() {
       setPrescription(null);
       setCode("");
       setCollectedBy("self");
-      const res = await getTransactions();
+      const res = await fetchTransactions();
       setTransactions(res.transactions || []);
     } catch (err: any) {
       toast({ title: "Could not complete dispensing", description: err.message, variant: "destructive" });
