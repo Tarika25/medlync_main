@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL ?? "https://medlync-backend.onrender.com/api";
+const API_BASE = "https://medlync-backend.onrender.com/api";
 
 function authHeaders(): Record<string, string> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
